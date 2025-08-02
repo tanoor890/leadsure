@@ -1,6 +1,5 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+// shared/db-schema.ts
+import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
@@ -26,20 +25,3 @@ export const trials = pgTable("trials", {
   status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-export const insertOrderSchema = createInsertSchema(orders).omit({
-  id: true,
-  createdAt: true,
-  status: true,
-});
-
-export const insertTrialSchema = createInsertSchema(trials).omit({
-  id: true,
-  createdAt: true,
-  status: true,
-});
-
-export type InsertOrder = z.infer<typeof insertOrderSchema>;
-export type Order = typeof orders.$inferSelect;
-export type InsertTrial = z.infer<typeof insertTrialSchema>;
-export type Trial = typeof trials.$inferSelect;
