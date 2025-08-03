@@ -1,4 +1,5 @@
-import { orders, trials, type Order, type Trial, type InsertOrder, type InsertTrial } from "@shared/schema";
+import { orders, trials } from "../shared/db-schema";
+import { type InsertOrder, type InsertTrial } from "../shared/zod-schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 

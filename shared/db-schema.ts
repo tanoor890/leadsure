@@ -25,3 +25,7 @@ export const trials = pgTable("trials", {
   status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Type exports
+export type Order = typeof orders.$inferSelect;
+export type Trial = typeof trials.$inferSelect;
