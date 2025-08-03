@@ -16,24 +16,15 @@
     },
     "api/health.ts": {
       "runtime": "nodejs18.x"
+    },
+    "api/simple-test.ts": {
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
     {
-      "source": "/api/test-db",
-      "destination": "/api/test-db.ts"
-    },
-    {
-      "source": "/api/debug-db",
-      "destination": "/api/debug-db.ts"
-    },
-    {
-      "source": "/api/migrate",
-      "destination": "/api/migrate.ts"
-    },
-    {
-      "source": "/api/health",
-      "destination": "/api/health.ts"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
       "source": "/(.*)",
