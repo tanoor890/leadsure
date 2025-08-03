@@ -5,17 +5,28 @@
   "installCommand": "npm install",
   "framework": "vite",
   "functions": {
-    "api/server/index.ts": {
+    "api/test-db.ts": {
       "runtime": "nodejs18.x"
     },
-    "api/test-db.ts": {
+    "api/debug-db.ts": {
+      "runtime": "nodejs18.x"
+    },
+    "api/migrate.ts": {
       "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/server/index.ts"
+      "source": "/api/test-db",
+      "destination": "/api/test-db.ts"
+    },
+    {
+      "source": "/api/debug-db",
+      "destination": "/api/debug-db.ts"
+    },
+    {
+      "source": "/api/migrate",
+      "destination": "/api/migrate.ts"
     },
     {
       "source": "/(.*)",
