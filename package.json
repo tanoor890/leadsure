@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "db:push": "drizzle-kit push",
-    "build": "cd client && npm install && npm run build && cp -r dist ../dist",
+    "build": "cd client && npm install && npm run build && cp -r dist ../dist && npm run db:push",
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install"
   }

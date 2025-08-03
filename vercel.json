@@ -14,10 +14,6 @@
   },
   "rewrites": [
     {
-      "source": "/api/test-db",
-      "destination": "/api/test-db.ts"
-    },
-    {
       "source": "/api/(.*)",
       "destination": "/api/server/index.ts"
     },
