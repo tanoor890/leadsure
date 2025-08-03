@@ -7,6 +7,9 @@
   "functions": {
     "api/server/index.ts": {
       "runtime": "nodejs18.x"
+    },
+    "api/test-db.ts": {
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [

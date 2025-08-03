@@ -1,73 +1,86 @@
-import { orders, trials, type Order, type Trial, type InsertOrder, type InsertTrial } from "@shared/db-schema";
-import { db } from "./db";
-import { eq } from "drizzle-orm";
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertOrderSchema, insertTrialSchema } from "../shared/zod-schema";
+import { z } from "zod";
 
-export interface IStorage {
-  // Order methods
-  createOrder(order: InsertOrder): Promise<Order>;
-  getOrder(id: number): Promise<Order | undefined>;
-  getAllOrders(): Promise<Order[]>;
-  updateOrderStatus(id: number, status: string): Promise<Order | undefined>;
-  
-  // Trial methods
-  createTrial(trial: InsertTrial): Promise<Trial>;
-  getTrial(id: number): Promise<Trial | undefined>;
-  getAllTrials(): Promise<Trial[]>;
-  updateTrialStatus(id: number, status: string): Promise<Trial | undefined>;
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Order routes
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const validatedData = insertOrderSchema.parse(req.body);
+      const order = await storage.createOrder(validatedData);
+      res.status(201).json(order);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
+    }
+  });
+
+  app.get("/api/orders", async (req, res) => {
+    try {
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/orders/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const order = await storage.getOrder(id);
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Trial routes
+  app.post("/api/trials", async (req, res) => {
+    try {
+      const validatedData = insertTrialSchema.parse(req.body);
+      const trial = await storage.createTrial(validatedData);
+      res.status(201).json(trial);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
+    }
+  });
+
+  app.get("/api/trials", async (req, res) => {
+    try {
+      const trials = await storage.getAllTrials();
+      res.json(trials);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/trials/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const trial = await storage.getTrial(id);
+      if (!trial) {
+        res.status(404).json({ message: "Trial not found" });
+        return;
+      }
+      res.json(trial);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
 }
-
-export class DatabaseStorage implements IStorage {
-  async createOrder(insertOrder: InsertOrder): Promise<Order> {
-    const [order] = await db
-      .insert(orders)
-      .values(insertOrder)
-      .returning();
-    return order;
-  }
-
-  async getOrder(id: number): Promise<Order | undefined> {
-    const [order] = await db.select().from(orders).where(eq(orders.id, id));
-    return order || undefined;
-  }
-
-  async getAllOrders(): Promise<Order[]> {
-    return await db.select().from(orders);
-  }
-
-  async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
-    const [order] = await db
-      .update(orders)
-      .set({ status })
-      .where(eq(orders.id, id))
-      .returning();
-    return order || undefined;
-  }
-
-  async createTrial(insertTrial: InsertTrial): Promise<Trial> {
-    const [trial] = await db
-      .insert(trials)
-      .values(insertTrial)
-      .returning();
-    return trial;
-  }
-
-  async getTrial(id: number): Promise<Trial | undefined> {
-    const [trial] = await db.select().from(trials).where(eq(trials.id, id));
-    return trial || undefined;
-  }
-
-  async getAllTrials(): Promise<Trial[]> {
-    return await db.select().from(trials);
-  }
-
-  async updateTrialStatus(id: number, status: string): Promise<Trial | undefined> {
-    const [trial] = await db
-      .update(trials)
-      .set({ status })
-      .where(eq(trials.id, id))
-      .returning();
-    return trial || undefined;
-  }
-}
-
-export const storage = new DatabaseStorage();
