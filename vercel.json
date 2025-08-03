@@ -6,7 +6,8 @@
   "framework": "node",
   "functions": {
     "server/index.ts": {
-      "runtime": "nodejs18.x"
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
     }
   },
   "rewrites": [

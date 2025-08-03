@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import "dotenv/config";
 import path from "path";
+import fs from "fs";
 
 const app = express();
 
@@ -87,14 +88,34 @@ app.use((req, res, next) => {
   } else {
     // Serve static files in production
     const distPath = path.resolve(process.cwd(), "dist");
-    app.use(express.static(distPath));
     
-    // Serve index.html for all non-API routes
-    app.get("*", (req, res) => {
-      if (!req.path.startsWith("/api")) {
-        res.sendFile(path.resolve(distPath, "index.html"));
-      }
-    });
+    // Check if dist directory exists
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      
+      // Serve index.html for all non-API routes
+      app.get("*", (req, res) => {
+        if (!req.path.startsWith("/api")) {
+          const indexPath = path.resolve(distPath, "index.html");
+          if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+          } else {
+            res.status(404).json({ message: "Frontend not built properly" });
+          }
+        }
+      });
+    } else {
+      // If dist doesn't exist, just serve API routes
+      app.get("*", (req, res) => {
+        if (!req.path.startsWith("/api")) {
+          res.status(404).json({ 
+            message: "Frontend not available", 
+            error: "dist directory not found",
+            path: distPath
+          });
+        }
+      });
+    }
   }
 })();
 
