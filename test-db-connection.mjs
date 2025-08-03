@@ -1,38 +1,40 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "./shared/db-schema.ts";
-import { migrate } from 'drizzle-orm/neon-serverless/migrator';
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import ws from 'ws';
 
+// Configure WebSocket for Neon
 neonConfig.webSocketConstructor = ws;
 
-// For testing, we'll use a mock DATABASE_URL
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/leadsure';
+const DATABASE_URL = 'postgresql://neondb_owner:npg_vwk9exJBp5jo@ep-restless-mode-aect6lsm-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
 
-console.log('Testing database connection...');
-console.log('DATABASE_URL:', DATABASE_URL ? 'Set' : 'Not set');
+async function testConnection() {
+  try {
+    console.log('🔌 Testing database connection...');
+    
+    const pool = new Pool({ connectionString: DATABASE_URL });
+    const db = drizzle(pool);
+    
+    // Test basic query
+    const result = await db.execute('SELECT NOW() as current_time, version() as db_version');
+    console.log('✅ Database connection successful!');
+    console.log('📅 Current time:', result[0].current_time);
+    console.log('🗄️ Database version:', result[0].db_version);
+    
+    // Test if tables exist
+    const tables = await db.execute(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_name IN ('orders', 'trials')
+    `);
+    
+    console.log('📋 Available tables:', tables.map(t => t.table_name));
+    
+    await pool.end();
+    console.log('✅ Database test completed successfully!');
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+  }
+}
 
-try {
-  const pool = new Pool({ connectionString: DATABASE_URL });
-  const db = drizzle({ client: pool, schema });
-  
-  console.log('✅ Database connection successful');
-  
-  // Test creating a table (this will fail if DATABASE_URL is not real)
-  console.log('Attempting to create tables...');
-  
-  // For now, just test the connection
-  const result = await pool.query('SELECT NOW()');
-  console.log('✅ Database query successful:', result.rows[0]);
-  
-  await pool.end();
-  console.log('✅ Database connection closed');
-  
-} catch (error) {
-  console.error('❌ Database connection failed:', error.message);
-  console.log('💡 To set up a real database:');
-  console.log('1. Sign up at https://neon.tech');
-  console.log('2. Create a new project');
-  console.log('3. Copy the DATABASE_URL');
-  console.log('4. Set it as an environment variable');
-} 
+testConnection(); 
