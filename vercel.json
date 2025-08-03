@@ -1,13 +1,18 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist",
+  "buildCommand": "cd server && npm install && npm run build",
+  "outputDirectory": "server/dist",
   "installCommand": "npm install",
-  "framework": "vite",
+  "framework": "node",
+  "functions": {
+    "server/index.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/api/(.*)",
+      "destination": "/server/index.ts"
     }
   ],
   "env": {
