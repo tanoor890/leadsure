@@ -1,10 +1,9 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertOrderSchema, insertTrialSchema } from "../shared/zod-schema";
 import { z } from "zod";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<void> {
   // Order routes
   app.post("/api/orders", async (req, res) => {
     try {
@@ -81,6 +80,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  // Health check route
+  app.get("/api/health", (req, res) => {
+    res.json({
+      message: "Backend API is working!",
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
 }
