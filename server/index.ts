@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import "dotenv/config";
+import path from "path";
 
 const app = express();
 
@@ -82,6 +83,17 @@ app.use((req, res, next) => {
       reusePort: true,
     }, () => {
       log(`serving on port ${port}`);
+    });
+  } else {
+    // Serve static files in production
+    const distPath = path.resolve(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    
+    // Serve index.html for all non-API routes
+    app.get("*", (req, res) => {
+      if (!req.path.startsWith("/api")) {
+        res.sendFile(path.resolve(distPath, "index.html"));
+      }
     });
   }
 })();
