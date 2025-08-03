@@ -1,11 +1,11 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "client/dist",
+  "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": "vite",
   "functions": {
-    "server/index.ts": {
+    "api/server/index.ts": {
       "runtime": "nodejs18.x"
     }
   },
