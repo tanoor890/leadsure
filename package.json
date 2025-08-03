@@ -15,8 +15,6 @@
     "concurrently": "^9.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "node-fetch": "^3.3.2",
-    "@neondatabase/serverless": "^0.10.4",
-    "drizzle-orm": "^0.39.1"
+    "node-fetch": "^3.3.2"
   }
 }
