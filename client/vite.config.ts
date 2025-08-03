@@ -10,6 +10,7 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "../shared"),
       "@assets": path.resolve(__dirname, "../attached_assets"),
     },
+    extensions: [".js", ".ts", ".jsx", ".tsx", ".json"],
   },
   build: {
     outDir: "dist",
